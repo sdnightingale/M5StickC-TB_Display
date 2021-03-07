@@ -52,3 +52,6 @@ Change main.cpp to tb_display.ino and place the .cpp .h and .ino into a director
   * Add a word wrapping fuction inside the print_char function
 * v1.3
   * Bugfix if the character that causes a word wrap is a space character
+* v1.3.1 (sdnightingale)
+  * Add 'Print' class inheritance to provide print(), println() and printf() functions.
+  * Handle backspace ('\b') char.

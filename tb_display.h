@@ -1,10 +1,10 @@
-
 /******************************************************************************
  * tb_display.h
  * Library for a simple text buffer scrolling display on the M5StickC.
- * Hague Nusseck @ electricidea
- * v1.3 04.Feb.2020
- * https://github.com/electricidea/M5StickC-TB_Display
+ * sdnightingale
+ * forked from  electricidea/M5StickC-TB_Display (Hague Nusseck @ electricidea) at v1.3
+ * v1.3.1 07.Mar.2021
+ * https://github.com/sdnightingale/M5StickC-TB_Display
  * 
  * This library makes it easy to display texts on the M5StickC.
  * The display behaves like a terminal: New text is added at the bottom.
@@ -19,9 +19,13 @@
  *          after a new line
  *        - Add a word wrapping fuction inside the print_char function
  * v1.3 = - Bugfix if the character that causes a word wrap is a space character
+ * v1.3.1 - Add 'Print' class inheritance to provide print(), println() and printf() functions; Handle backspace ('\b') char
  * 
  * Distributed as-is; no warranty is given.
  ******************************************************************************/
+
+#ifndef tb_display_h
+#define tb_display_h
 
 // Enable or disable Waord Wrap
 extern boolean tb_display_word_wrap;
@@ -95,3 +99,22 @@ void tb_display_print_String(const char *s, int chr_delay = 0);
 //    tb_display_print_char('X');
 // =============================================================
 void tb_display_print_char(byte data);
+
+// =============================================================
+//           class TextBuffer;
+// subclass of Print to implement write() functions
+// in order to allow the use of parent functions such
+// as print, printl and printf in normal manner
+// example:
+//    TextBuffer tb(1);
+//    tb.printf("%u + %u equals 2",1,1);
+// =============================================================
+class TextBuffer : public Print
+{
+public:
+    TextBuffer(int rotation);
+    size_t write(uint8_t);
+    size_t write(const uint8_t *buffer, size_t size);
+};
+
+#endif

@@ -1,9 +1,10 @@
 /******************************************************************************
- * tb_display.cpp
+ * tb_display.h
  * Library for a simple text buffer scrolling display on the M5StickC.
- * Hague Nusseck @ electricidea
- * v1.3 04.Feb.2020
- * https://github.com/electricidea/M5StickC-TB_Display
+ * sdnightingale
+ * forked from  electricidea/M5StickC-TB_Display (Hague Nusseck @ electricidea) at v1.3
+ * v1.3.1 07.Mar.2021
+ * https://github.com/sdnightingale/M5StickC-TB_Display
  * 
  * This library makes it easy to display texts on the M5StickC.
  * The display behaves like a terminal: New text is added at the bottom.
@@ -18,11 +19,14 @@
  *          after a new line
  *        - Add a word wrapping fuction inside the print_char function
  * v1.3 = - Bugfix if the character that causes a word wrap is a space character
+ * v1.3.1 - Add 'Print' class inheritance to provide print(), println() and printf() functions; Handle backspace ('\b') char
  * 
  * Distributed as-is; no warranty is given.
  ******************************************************************************/
 
 #include <Arduino.h>
+#include <Print.h>
+#include <inttypes.h>
 #include <M5StickC.h>
 #include "tb_display.h"
 
@@ -171,6 +175,15 @@ void tb_display_print_char(byte data){
     text_buffer[text_buffer_write_pointer_y][text_buffer_write_pointer_x] = '\0';
     tb_display_new_line();
   }
+  // handle backspace
+  if (data == '\b')
+  {
+    if (text_buffer_write_pointer_x > 0){
+      text_buffer_write_pointer_x--;
+      // draw a char off screen to get the length to go backwards
+      screen_xpos -= M5.Lcd.drawChar(text_buffer[text_buffer_write_pointer_y][text_buffer_write_pointer_x], -100, -100, TEXT_SIZE);
+    }
+  }
   // only 'printable' characters
   if (data > 31 && data < 128) {
     // print the character and get the new xpos
@@ -269,3 +282,34 @@ void tb_display_print_String(const char *s, int chr_delay){
   }
 }
 
+// =============================================================
+// TextBuffer::TextBuffer class constructor
+// example:
+//    TextBuffer tb(1);
+// =============================================================
+TextBuffer::TextBuffer(int rotation)
+{
+  tb_display_init(rotation);
+}
+
+// =============================================================
+// TextBuffer::write(uint8_t)
+//
+// Function override of Print::write(uint8_t c)
+// =============================================================
+size_t TextBuffer::write(uint8_t c)
+{
+  tb_display_print_char(c);
+  return 1;
+}
+
+// =============================================================
+// TextBuffer::write(const uint8_t *buffer, size_t size)
+//
+// Function override of Print::write(const uint8_t *buffer, size_t size)
+// =============================================================
+size_t TextBuffer::write(const uint8_t *buffer, size_t size)
+{
+  tb_display_print_String((char *)buffer, 0);
+  return size;
+}
