@@ -27,6 +27,11 @@
 #ifndef tb_display_h
 #define tb_display_h
 
+#include <Arduino.h>
+#include <Print.h>
+#include <inttypes.h>
+#include <M5StickC.h>
+
 // Enable or disable Waord Wrap
 extern boolean tb_display_word_wrap;
 
@@ -112,7 +117,8 @@ void tb_display_print_char(byte data);
 class TextBuffer : public Print
 {
 public:
-    TextBuffer(int rotation);
+    void begin();
+    void begin(int rotation);
     size_t write(uint8_t);
     size_t write(const uint8_t *buffer, size_t size);
 };
