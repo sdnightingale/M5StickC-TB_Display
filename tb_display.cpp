@@ -313,3 +313,5 @@ size_t TextBuffer::write(const uint8_t *buffer, size_t size)
   tb_display_print_String((char *)buffer, 0);
   return size;
 }
+
+TextBuffer tb(3);
